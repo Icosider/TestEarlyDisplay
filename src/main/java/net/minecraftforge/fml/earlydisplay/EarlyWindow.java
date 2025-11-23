@@ -108,7 +108,7 @@ public class EarlyWindow implements ImmediateWindowProvider {
 
     @Override
     public String name() {
-        return "fmlearlywindow";
+        return "test_fmlearlywindow";
     }
     @Override
     public Runnable initialize(String[] arguments) {
