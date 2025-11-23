@@ -1,0 +1,71 @@
+plugins {
+    id 'org.javamodularity.moduleplugin' version '1.8.7' apply false
+}
+
+apply plugin: 'java-library'
+apply plugin: 'jacoco'
+apply plugin: 'org.javamodularity.moduleplugin'
+
+import org.gradle.internal.os.OperatingSystem
+
+switch (OperatingSystem.current()) {
+	case OperatingSystem.LINUX:
+		project.ext.lwjglNatives = "natives-linux"
+		break
+	case OperatingSystem.MAC_OS:
+		project.ext.lwjglNatives = "natives-macos"
+		break
+	case OperatingSystem.WINDOWS:
+		project.ext.lwjglNatives = "natives-windows"
+		break
+}
+
+java.withSourcesJar()
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://libraries.minecraft.net/"
+    }
+    maven {
+        url = "https://maven.minecraftforge.net/"
+    }
+}
+
+dependencies {
+    compileOnly('org.jetbrains:annotations:23.0.0')
+    implementation("net.minecraftforge:fmlloader:1.20.1-47.4.11")
+    implementation("net.minecraftforge:fmlcore:1.20.1-47.4.11")
+    implementation('org.lwjgl:lwjgl:3.3.1')
+    implementation('org.lwjgl:lwjgl-glfw:3.3.1')
+    implementation('org.lwjgl:lwjgl-opengl:3.3.1')
+    implementation('org.lwjgl:lwjgl-stb:3.3.1')
+    implementation('org.lwjgl:lwjgl-tinyfd:3.3.1')
+    implementation('org.slf4j:slf4j-api:1.8.0-beta4')
+    implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.8.2')
+    testImplementation('org.powermock:powermock-core:2.0.9')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.8.2')
+    testRuntimeOnly('org.slf4j:slf4j-jdk14:1.8.0-beta4')
+    testRuntimeOnly("org.lwjgl:lwjgl::$lwjglNatives")
+    testRuntimeOnly("org.lwjgl:lwjgl-glfw::$lwjglNatives")
+    testRuntimeOnly("org.lwjgl:lwjgl-opengl::$lwjglNatives")
+    testRuntimeOnly("org.lwjgl:lwjgl-stb::$lwjglNatives")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar.doFirst {
+    MANIFESTS.each { pkg, values ->
+        if (pkg == '')
+            manifest.attributes(values)
+        else
+            manifest.attributes(values, pkg)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+}
