@@ -57,15 +57,6 @@ test {
     useJUnitPlatform()
 }
 
-jar.doFirst {
-    MANIFESTS.each { pkg, values ->
-        if (pkg == '')
-            manifest.attributes(values)
-        else
-            manifest.attributes(values, pkg)
-    }
-}
-
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
 }
